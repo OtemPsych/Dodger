@@ -30,16 +30,24 @@ const void TextHolder::load(const Texts::ID& id, const std::string& str,
     text->setPosition(pos);
     text->setScale(1.1f, 1.1f);
 
-    auto inserted = mTextHolder.insert(std::make_pair(id, std::move(text)));
-    assert(inserted.second);
+    if (mTextHolder.find(id) != mTextHolder.end())
+        mTextHolder[id].insert(std::make_pair(mTextHolder[id].size(), std::move(text)));
+    else {
+        std::map<unsigned, std::unique_ptr<sf::Text>> newMap;
+        mTextHolder.insert(std::make_pair(id, std::move(newMap)));
+        mTextHolder[id].insert(std::make_pair(mTextHolder[id].size(), std::move(text)));
+    }
 }
     // Get
-sf::Text& TextHolder::get(const Texts::ID& id) const
+sf::Text& TextHolder::get(const Texts::ID& id, const unsigned pos) const
 {
-    auto found = mTextHolder.find(id);
-    assert(found != mTextHolder.end());
+    auto foundMap = mTextHolder.find(id);
+    assert(foundMap != mTextHolder.end());
 
-    return *found->second;
+    auto& foundText = *foundMap->second.find(pos);
+    assert(foundText != *foundMap->second.end());
+
+    return *foundText.second;
 }
     // Fade Text
 const void TextHolder::fadeText(sf::Text& text, const float rate) const

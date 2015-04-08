@@ -16,7 +16,7 @@ private:
              RIGHT;
     }     mMovement;
     float mSpeed;
-    long   mScore;
+    long  mScore;
 
 public:
 // Constructor

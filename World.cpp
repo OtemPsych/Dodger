@@ -52,11 +52,13 @@ const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed
             if (mPlayerBase < 4) {
                 mPlayerBase++;
                 addPlayers();
+                resetGame();
             }
         if (key == sf::Keyboard::BackSpace)
             if (mPlayerBase > 1) {
                 mPlayerBase--;
                 mPlayers.pop_back();
+                resetGame();
             }
     }
 
@@ -132,6 +134,7 @@ const void World::handleCollision()
     // Reset Game
 const void World::resetGame()
 {
+    mPlayers.clear();
     addPlayers();
     mEnemies.clear();
 }
@@ -150,10 +153,8 @@ const void World::update(const sf::Time& dt)
     addEnemies();
     recycleEnemies();
 
-    mTextHolder.get(Texts::Player1Score).setString(mPlayers[0].getScoreText());
-    mTextHolder.get(Texts::Player2Score).setString(mPlayers[1].getScoreText());
-    mTextHolder.get(Texts::Player3Score).setString(mPlayers[2].getScoreText());
-    mTextHolder.get(Texts::Player4Score).setString(mPlayers[3].getScoreText());
+    for (unsigned i = 0; i < mPlayers.size(); i++)
+        mTextHolder.get(Texts::Scores, i).setString(mPlayers[i].getScoreText());
 }
     // Draw
 const void World::draw()
@@ -162,31 +163,25 @@ const void World::draw()
                                                                 : mEnemies.size()); i++) {
         if (mPlayers.begin()+i < mPlayers.end()) {
             mWindow.draw(mPlayers[i].getShape());
+            mWindow.draw(mTextHolder.get(Texts::Scores, i));
         }
         if (mEnemies.begin()+i < mEnemies.end())
             mWindow.draw(mEnemies[i].getShape());
 
     }
-    mWindow.draw(mTextHolder.get(Texts::Player1Score));
-    if (mPlayers.size() > 1)
-        mWindow.draw(mTextHolder.get(Texts::Player2Score));
-    if (mPlayers.size() > 2)
-        mWindow.draw(mTextHolder.get(Texts::Player3Score));
-    if (mPlayers.size() > 3)
-        mWindow.draw(mTextHolder.get(Texts::Player4Score));
 }
     // Load Texts
 const void World::loadTexts()
 {
-    mTextHolder.load(Texts::Player1Score, mPlayers[0].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, mPlayers[0].getScoreText(), 25.f,
                      sf::Vector2f(100.f, mWindow.getSize().y - 50.f), sf::Color::Green);
 
-    mTextHolder.load(Texts::Player2Score, mPlayers[1].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, mPlayers[1].getScoreText(), 25.f,
                      sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 50.f), sf::Color::Cyan);
 
-    mTextHolder.load(Texts::Player3Score, mPlayers[2].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, mPlayers[2].getScoreText(), 25.f,
                      sf::Vector2f(100.f, mWindow.getSize().y - 100.f), sf::Color::Yellow);
 
-    mTextHolder.load(Texts::Player4Score, mPlayers[3].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, mPlayers[3].getScoreText(), 25.f,
                      sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 100.f), sf::Color::Red);
 }
