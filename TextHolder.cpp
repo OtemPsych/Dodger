@@ -14,7 +14,6 @@ TextHolder::TextHolder()
 
 // Public Methods
     // Load
-    #include <iostream>
 const void TextHolder::load(const Texts::ID& id, const std::string& str,
                             const unsigned charSize, const sf::Vector2f& pos,
                             const sf::Color& color)
