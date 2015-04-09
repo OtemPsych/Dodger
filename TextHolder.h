@@ -15,7 +15,7 @@ class TextHolder :private sf::NonCopyable
 private:
 // Private Data Members
     std::map<Texts::ID,
-        std::map<unsigned, std::unique_ptr<sf::Text>>> mTextHolder;
+        std::vector<std::unique_ptr<sf::Text>>> mTextHolder;
 
     sf::Font mFont;
 

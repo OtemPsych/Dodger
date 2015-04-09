@@ -10,10 +10,11 @@ std::string NumberToString(T num)
     return temp.str();
 }
 // Constructor
-Player::Player(const sf::Vector2f& worldBounds)
+Player::Player(sf::Text& text, const sf::Vector2f& worldBounds)
     : Entity()
     , mSpeed(475.f)
     , mScore(0)
+    , mScoreText(text)
 {
 // Shape
     float Size = 45.f;
@@ -77,15 +78,17 @@ const void Player::update(const sf::Time& dt)
 
     setVelocity(movement);
     Entity::update(dt);
+
+    updateScoreText();
+}
+    // Update Score Text
+const void Player::updateScoreText()
+{
+    mScoreText.setString("Score: " + NumberToString(mScore));
 }
     // Reset Position
 const void Player::resetPosition(const sf::Vector2f& worldBounds)
 {
     getShape().setPosition(sf::Vector2f(worldBounds.x / 2 - getShape().getSize().x / 2,
                                         worldBounds.y - getShape().getSize().y - 10.f));
-}
-    // Score Text
-const std::string Player::getScoreText() const
-{
-    return "Score: " + NumberToString(mScore);
 }

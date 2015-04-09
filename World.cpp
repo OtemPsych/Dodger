@@ -8,8 +8,8 @@ World::World(sf::RenderWindow& window)
     , mTextHolder()
     , mWindow(window)
 {
-    addPlayers();
     loadTexts();
+    addPlayers();
 }
 
 // Public Methods
@@ -32,7 +32,8 @@ const void World::recycleEnemies()
 const void World::addPlayers()
 {
     for (short i = mPlayers.size(); i < mPlayerBase; i++) {
-        Player player(sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
+        Player player(mTextHolder.get(Texts::Scores, i),
+                      sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
         mPlayers.push_back(std::move(player));
     }
 
@@ -145,6 +146,7 @@ const void World::update(const sf::Time& dt)
                                                                 : mEnemies.size()); i++) {
         if (mPlayers.begin()+i < mPlayers.end()) {
             mPlayers[i].update(dt);
+            mTextHolder.correctProperties(mTextHolder.get(Texts::Scores, i));
         }
         if (mEnemies.begin()+i < mEnemies.end())
             mEnemies[i].update(dt);
@@ -152,36 +154,33 @@ const void World::update(const sf::Time& dt)
 
     addEnemies();
     recycleEnemies();
-
-    for (unsigned i = 0; i < mPlayers.size(); i++)
-        mTextHolder.get(Texts::Scores, i).setString(mPlayers[i].getScoreText());
 }
     // Draw
 const void World::draw()
 {
     for (unsigned i = 0; i < (mPlayers.size() > mEnemies.size() ? mPlayers.size()
                                                                 : mEnemies.size()); i++) {
+        if (mEnemies.begin()+i < mEnemies.end())
+            mWindow.draw(mEnemies[i].getShape());
         if (mPlayers.begin()+i < mPlayers.end()) {
             mWindow.draw(mPlayers[i].getShape());
             mWindow.draw(mTextHolder.get(Texts::Scores, i));
         }
-        if (mEnemies.begin()+i < mEnemies.end())
-            mWindow.draw(mEnemies[i].getShape());
 
     }
 }
     // Load Texts
 const void World::loadTexts()
 {
-    mTextHolder.load(Texts::Scores, mPlayers[0].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, "0", 25.f,
                      sf::Vector2f(100.f, mWindow.getSize().y - 50.f), sf::Color::Green);
 
-    mTextHolder.load(Texts::Scores, mPlayers[1].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, "0", 25.f,
                      sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 50.f), sf::Color::Cyan);
 
-    mTextHolder.load(Texts::Scores, mPlayers[2].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, "0", 25.f,
                      sf::Vector2f(100.f, mWindow.getSize().y - 100.f), sf::Color::Yellow);
 
-    mTextHolder.load(Texts::Scores, mPlayers[3].getScoreText(), 25.f,
+    mTextHolder.load(Texts::Scores, "0", 25.f,
                      sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 100.f), sf::Color::Red);
 }

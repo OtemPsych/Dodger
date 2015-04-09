@@ -14,21 +14,22 @@ private:
              DOWN,
              LEFT,
              RIGHT;
-    }     mMovement;
-    float mSpeed;
-    long  mScore;
+    }         mMovement;
+    float     mSpeed;
+    long      mScore;
+    sf::Text& mScoreText;
 
 public:
 // Constructor
-    explicit Player(const sf::Vector2f& worldBounds);
+    Player(sf::Text& text, const sf::Vector2f& worldBounds);
 // Public Methods
     const void handleCollision(const sf::Vector2f& worldBounds);
     const bool handleCollision(std::vector<Enemy>& enemies);
     virtual const void update(const sf::Time& dt);
+    const void updateScoreText();
     const void resetPosition(const sf::Vector2f& worldBounds);
 
     // Getter
-    const std::string getScoreText() const;
     inline movement& getMovement() { return mMovement; }
 };
 #endif // Player_H_

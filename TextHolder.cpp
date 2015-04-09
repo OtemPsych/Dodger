@@ -1,7 +1,6 @@
 #include "TextHolder.h"
 
 #include <stdexcept>
-#include <cassert>
 
 // Constructor
 TextHolder::TextHolder()
@@ -15,6 +14,7 @@ TextHolder::TextHolder()
 
 // Public Methods
     // Load
+    #include <iostream>
 const void TextHolder::load(const Texts::ID& id, const std::string& str,
                             const unsigned charSize, const sf::Vector2f& pos,
                             const sf::Color& color)
@@ -30,24 +30,16 @@ const void TextHolder::load(const Texts::ID& id, const std::string& str,
     text->setPosition(pos);
     text->setScale(1.1f, 1.1f);
 
-    if (mTextHolder.find(id) != mTextHolder.end())
-        mTextHolder[id].insert(std::make_pair(mTextHolder[id].size(), std::move(text)));
-    else {
-        std::map<unsigned, std::unique_ptr<sf::Text>> newMap;
-        mTextHolder.insert(std::make_pair(id, std::move(newMap)));
-        mTextHolder[id].insert(std::make_pair(mTextHolder[id].size(), std::move(text)));
+    if (mTextHolder.find(id) == mTextHolder.end()) {
+        std::vector<std::unique_ptr<sf::Text>> newVector;
+        mTextHolder.insert(std::make_pair(id, std::move(newVector)));
     }
+    mTextHolder[id].push_back(std::move(text));
 }
     // Get
 sf::Text& TextHolder::get(const Texts::ID& id, const unsigned pos) const
 {
-    auto foundMap = mTextHolder.find(id);
-    assert(foundMap != mTextHolder.end());
-
-    auto& foundText = *foundMap->second.find(pos);
-    assert(foundText != *foundMap->second.end());
-
-    return *foundText.second;
+    return *mTextHolder.find(id)->second[pos];
 }
     // Fade Text
 const void TextHolder::fadeText(sf::Text& text, const float rate) const
