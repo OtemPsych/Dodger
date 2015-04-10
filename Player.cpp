@@ -34,7 +34,16 @@ Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2
     mScoreText.setColor(getShape().getFillColor());
 }
 
-// Private Method
+// Private Methods
+    // Update Score
+const void Player::updateScore()
+{
+    if (getShape().getFillColor().a != 0.f) {
+        mScore += 1;
+        mScoreText.setString("Score: " + NumberToString(mScore));
+    }
+}
+    // Set Relative Text Position
 const void Player::setRelativeTextPosition(const sf::Vector2f& relText) const
 {
      mScoreText.setPosition(sf::Vector2f(relText.x,
@@ -85,12 +94,4 @@ const void Player::update(const sf::Time& dt)
     Entity::update(dt);
 
     updateScore();
-}
-    // Update Score
-const void Player::updateScore()
-{
-    if (getShape().getFillColor().a != 0.f) {
-        mScore += 1;
-        mScoreText.setString("Score: " + NumberToString(mScore));
-    }
 }

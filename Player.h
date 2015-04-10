@@ -19,7 +19,8 @@ private:
     long      mScore;
     sf::Text& mScoreText;
 
-// Private Method
+// Private Methods
+    const void updateScore();
     const void setRelativeTextPosition(const sf::Vector2f& relText) const;
 
 public:
@@ -29,7 +30,6 @@ public:
     const void handleCollision(const sf::Vector2f& worldBounds);
     const bool handleCollision(std::vector<Enemy>& enemies);
     virtual const void update(const sf::Time& dt);
-    const void updateScore();
 
     // Getters
     inline const sf::Text& getScoreText() const { return mScoreText; }
