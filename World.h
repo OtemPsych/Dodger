@@ -16,26 +16,30 @@ private:
     std::vector<Player> mPlayers;
     std::vector<Enemy>  mEnemies;
 
-    short               mPlayerBase;
+    unsigned short      mPlayerBase;
+    unsigned short      mMaxPlayerBase;
+
+    unsigned short      mMaxEnemyBase;
 
     TextHolder          mTextHolder;
     sf::RenderWindow&   mWindow;
+
+// Private Methods
+    const void addEnemies();
+    const void recycleEnemies();
+    const void addPlayers();
+
+    const void resetGame();
+    const void loadTexts();
 
 public:
 // Constructor
     explicit World(sf::RenderWindow& window);
 // Public Methods
-    const void addEnemies();
-    const void recycleEnemies();
-
-    const void addPlayers();
-
     const void handleInput(const sf::Keyboard::Key& key, const bool isPressed);
     const void handleCollision();
-    const void resetGame();
     const void update(const sf::Time& dt);
     const void draw();
 
-    const void loadTexts();
 };
 #endif // World_H_

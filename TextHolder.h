@@ -1,7 +1,6 @@
 #ifndef TextHolder_H_
 #define TextHolder_H_
 
-#include <map>
 #include <memory>
 
 #include <SFML/System/NonCopyable.hpp>

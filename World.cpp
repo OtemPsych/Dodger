@@ -5,6 +5,8 @@ World::World(sf::RenderWindow& window)
     : mPlayers()
     , mEnemies()
     , mPlayerBase(1)
+    , mMaxPlayerBase(4)
+    , mMaxEnemyBase(30)
     , mTextHolder()
     , mWindow(window)
 {
@@ -12,11 +14,11 @@ World::World(sf::RenderWindow& window)
     addPlayers();
 }
 
-// Public Methods
+// Private Methods
     // Add Enemies
 const void World::addEnemies()
 {
-    if (mEnemies.size() < 30) {
+    if (mEnemies.size() < mMaxEnemyBase) {
         Enemy newEnemy(sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
         mEnemies.push_back(std::move(newEnemy));
     }
@@ -31,8 +33,15 @@ const void World::recycleEnemies()
     // Add Players
 const void World::addPlayers()
 {
+    const sf::Vector2f leftPosition(80.f, mWindow.getSize().y - 30.f);
+    const sf::Vector2f rightPosition(mWindow.getSize().x - leftPosition.x, leftPosition.y);
+
     for (short i = mPlayers.size(); i < mPlayerBase; i++) {
         Player player(mTextHolder.get(Texts::Scores, i),
+                      (i % 2 == 0 ? (i > 0 ? mPlayers[i-2].getScoreText().getPosition()
+                                           : leftPosition)
+                                  : (i > 1 ? mPlayers[i-2].getScoreText().getPosition()
+                                           : rightPosition)),
                       sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
         mPlayers.push_back(std::move(player));
     }
@@ -44,15 +53,30 @@ const void World::addPlayers()
     if (mPlayers.size() > 3)
         mPlayers[3].getShape().setFillColor(sf::Color::Red);
 }
+    // Reset Game
+const void World::resetGame()
+{
+    mPlayers.clear();
+    addPlayers();
+    mEnemies.clear();
+}
+    // Load Texts
+const void World::loadTexts()
+{
+    for (unsigned i = 0; i < mMaxPlayerBase; i++)
+        mTextHolder.load(Texts::Scores, "", 25.f,
+                         sf::Vector2f(mWindow.getSize()), sf::Color::White);
+}
+
+// Public Methods
     // Handle Input
 const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed)
 {
 // Add Players
     if (isPressed) {
         if (key == sf::Keyboard::Return)
-            if (mPlayerBase < 4) {
+            if (mPlayerBase < mMaxPlayerBase) {
                 mPlayerBase++;
-                addPlayers();
                 resetGame();
             }
         if (key == sf::Keyboard::BackSpace)
@@ -132,13 +156,6 @@ const void World::handleCollision()
         resetGame();
     }
 }
-    // Reset Game
-const void World::resetGame()
-{
-    mPlayers.clear();
-    addPlayers();
-    mEnemies.clear();
-}
     // Update
 const void World::update(const sf::Time& dt)
 {
@@ -162,25 +179,11 @@ const void World::draw()
                                                                 : mEnemies.size()); i++) {
         if (mEnemies.begin()+i < mEnemies.end())
             mWindow.draw(mEnemies[i].getShape());
+
         if (mPlayers.begin()+i < mPlayers.end()) {
-            mWindow.draw(mPlayers[i].getShape());
+            if (mPlayers[i].getShape().getFillColor().a > 0.f)
+                mWindow.draw(mPlayers[i].getShape());
             mWindow.draw(mTextHolder.get(Texts::Scores, i));
         }
-
     }
-}
-    // Load Texts
-const void World::loadTexts()
-{
-    mTextHolder.load(Texts::Scores, "0", 25.f,
-                     sf::Vector2f(100.f, mWindow.getSize().y - 50.f), sf::Color::Green);
-
-    mTextHolder.load(Texts::Scores, "0", 25.f,
-                     sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 50.f), sf::Color::Cyan);
-
-    mTextHolder.load(Texts::Scores, "0", 25.f,
-                     sf::Vector2f(100.f, mWindow.getSize().y - 100.f), sf::Color::Yellow);
-
-    mTextHolder.load(Texts::Scores, "0", 25.f,
-                     sf::Vector2f(mWindow.getSize().x - 100.f, mWindow.getSize().y - 100.f), sf::Color::Red);
 }

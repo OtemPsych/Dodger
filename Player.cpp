@@ -10,7 +10,7 @@ std::string NumberToString(T num)
     return temp.str();
 }
 // Constructor
-Player::Player(sf::Text& text, const sf::Vector2f& worldBounds)
+Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2f& worldBounds)
     : Entity()
     , mSpeed(475.f)
     , mScore(0)
@@ -19,7 +19,8 @@ Player::Player(sf::Text& text, const sf::Vector2f& worldBounds)
 // Shape
     float Size = 45.f;
     getShape().setSize(sf::Vector2f(Size, Size));
-    resetPosition(worldBounds);
+    getShape().setPosition(sf::Vector2f(worldBounds.x / 2 - getShape().getSize().x / 2,
+                                        worldBounds.y - getShape().getSize().y - 10.f));
 
     getShape().setFillColor(sf::Color::Green);
 
@@ -31,6 +32,16 @@ Player::Player(sf::Text& text, const sf::Vector2f& worldBounds)
 // Movement
     mMovement.UP = mMovement.DOWN
     = mMovement.LEFT = mMovement.RIGHT = false;
+
+// Relative Text Position
+    setRelativeTextPosition(relTextPos);
+}
+
+// Private Method
+const void Player::setRelativeTextPosition(const sf::Vector2f& relText) const
+{
+     mScoreText.setPosition(sf::Vector2f(relText.x,
+                                         relText.y - 30.f));
 }
 
 // Public Methods
@@ -62,9 +73,6 @@ const bool Player::handleCollision(std::vector<Enemy>& enemies)
     // Update
 const void Player::update(const sf::Time& dt)
 {
-    if (getShape().getFillColor().a != 0.f)
-        mScore += 1;
-
     sf::Vector2f movement(0.f, 0.f);
 
     if (mMovement.UP)
@@ -79,16 +87,18 @@ const void Player::update(const sf::Time& dt)
     setVelocity(movement);
     Entity::update(dt);
 
-    updateScoreText();
+    updateScore();
+}
+    // Update Score
+const void Player::updateScore()
+{
+    if (getShape().getFillColor().a != 0.f) {
+        mScore += 1;
+        updateScoreText();
+    }
 }
     // Update Score Text
-const void Player::updateScoreText()
+const void Player::updateScoreText() const
 {
     mScoreText.setString("Score: " + NumberToString(mScore));
-}
-    // Reset Position
-const void Player::resetPosition(const sf::Vector2f& worldBounds)
-{
-    getShape().setPosition(sf::Vector2f(worldBounds.x / 2 - getShape().getSize().x / 2,
-                                        worldBounds.y - getShape().getSize().y - 10.f));
 }

@@ -19,17 +19,21 @@ private:
     long      mScore;
     sf::Text& mScoreText;
 
+// Private Method
+    const void setRelativeTextPosition(const sf::Vector2f& relText) const;
+
 public:
 // Constructor
-    Player(sf::Text& text, const sf::Vector2f& worldBounds);
+    Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2f& worldBounds);
 // Public Methods
     const void handleCollision(const sf::Vector2f& worldBounds);
     const bool handleCollision(std::vector<Enemy>& enemies);
     virtual const void update(const sf::Time& dt);
-    const void updateScoreText();
-    const void resetPosition(const sf::Vector2f& worldBounds);
+    const void updateScore();
+    const void updateScoreText() const;
 
     // Getter
+    const inline sf::Text& getScoreText() const { return mScoreText; }
     inline movement& getMovement() { return mMovement; }
 };
 #endif // Player_H_
