@@ -33,7 +33,7 @@ const void World::recycleEnemies()
     // Add Players
 const void World::addPlayers()
 {
-    const sf::Vector2f leftPosition(80.f, mWindow.getSize().y - 30.f);
+    const sf::Vector2f leftPosition(85.f, mWindow.getSize().y - 30.f);
     const sf::Vector2f rightPosition(mWindow.getSize().x - leftPosition.x, leftPosition.y);
 
     for (short i = mPlayers.size(); i < mPlayerBase; i++) {
@@ -45,13 +45,6 @@ const void World::addPlayers()
                       sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
         mPlayers.push_back(std::move(player));
     }
-
-    if (mPlayers.size() > 1)
-        mPlayers[1].getShape().setFillColor(sf::Color::Cyan);
-    if (mPlayers.size() > 2)
-        mPlayers[2].getShape().setFillColor(sf::Color::Yellow);
-    if (mPlayers.size() > 3)
-        mPlayers[3].getShape().setFillColor(sf::Color::Red);
 }
     // Reset Game
 const void World::resetGame()
@@ -65,7 +58,7 @@ const void World::loadTexts()
 {
     for (unsigned i = 0; i < mMaxPlayerBase; i++)
         mTextHolder.load(Texts::Scores, "", 25.f,
-                         sf::Vector2f(mWindow.getSize()), sf::Color::White);
+                         sf::Vector2f(0.f, 0.f), sf::Color::White);
 }
 
 // Public Methods

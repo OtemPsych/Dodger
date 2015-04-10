@@ -30,10 +30,9 @@ public:
     const bool handleCollision(std::vector<Enemy>& enemies);
     virtual const void update(const sf::Time& dt);
     const void updateScore();
-    const void updateScoreText() const;
 
-    // Getter
-    const inline sf::Text& getScoreText() const { return mScoreText; }
+    // Getters
+    inline const sf::Text& getScoreText() const { return mScoreText; }
     inline movement& getMovement() { return mMovement; }
 };
 #endif // Player_H_

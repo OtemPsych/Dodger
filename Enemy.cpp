@@ -13,11 +13,8 @@ Enemy::Enemy(const sf::Vector2f& worldBounds)
 
     // Position
     float xPos = (float)rand() / RAND_MAX * (worldBounds.x - Size);
-    float yPos = -Size - 35.f;
+    float yPos = -Size - 55.f;
     getShape().setPosition(sf::Vector2f(xPos, yPos));
-
-    // Color
-    getShape().setFillColor(sf::Color::Magenta);
 
 // Side
     setSide(ENEMY);

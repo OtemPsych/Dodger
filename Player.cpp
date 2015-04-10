@@ -22,19 +22,16 @@ Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2
     getShape().setPosition(sf::Vector2f(worldBounds.x / 2 - getShape().getSize().x / 2,
                                         worldBounds.y - getShape().getSize().y - 10.f));
 
-    getShape().setFillColor(sf::Color::Green);
-
 // Side
     setSide(PLAYER);
-
 // Velocity
     setVelocity(sf::Vector2f(mSpeed, mSpeed));
 // Movement
     mMovement.UP = mMovement.DOWN
     = mMovement.LEFT = mMovement.RIGHT = false;
-
-// Relative Text Position
+// Relative Text
     setRelativeTextPosition(relTextPos);
+    mScoreText.setColor(getShape().getFillColor());
 }
 
 // Private Method
@@ -94,11 +91,6 @@ const void Player::updateScore()
 {
     if (getShape().getFillColor().a != 0.f) {
         mScore += 1;
-        updateScoreText();
+        mScoreText.setString("Score: " + NumberToString(mScore));
     }
-}
-    // Update Score Text
-const void Player::updateScoreText() const
-{
-    mScoreText.setString("Score: " + NumberToString(mScore));
 }
