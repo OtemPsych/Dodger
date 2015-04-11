@@ -2,9 +2,11 @@
 #define Player_H_
 
 #include "Enemy.h"
+#include "Power-Ups.h"
 
 #include <SFML/Graphics/Text.hpp>
 
+class Power_Ups;
 class Player :public Entity
 {
 private:
@@ -15,9 +17,10 @@ private:
              LEFT,
              RIGHT;
     }         mMovement;
-    float     mSpeed;
     long      mScore;
     sf::Text& mScoreText;
+
+    bool      mHavePower;
 
 // Private Methods
     const void updateScore();
@@ -27,12 +30,17 @@ public:
 // Constructor
     Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2f& worldBounds);
 // Public Methods
-    const void handleCollision(const sf::Vector2f& worldBounds);
-    const bool handleCollision(std::vector<Enemy>& enemies);
+    const bool handleCollision(std::vector<Power_Ups>& powers,
+                               std::vector<Enemy>& enemies,
+                               const sf::Vector2f& worldBounds,
+                               const sf::Time& dt);
     virtual const void update(const sf::Time& dt);
 
+    // Setter
+    inline const void setHavePower(const bool cond) { mHavePower = cond; }
     // Getters
     inline const sf::Text& getScoreText() const { return mScoreText; }
     inline movement& getMovement() { return mMovement; }
+    inline const bool getHavePower() const { return mHavePower; }
 };
 #endif // Player_H_

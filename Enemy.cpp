@@ -19,15 +19,10 @@ Enemy::Enemy(const sf::Vector2f& worldBounds)
 // Side
     setSide(ENEMY);
 
-// Velocity
+// Speed / Velocity
     float maxYVel = 600.f;
     float minYVel = 250.f;
     float yVel = (float)rand() / RAND_MAX * (maxYVel - minYVel) + minYVel;
+    setSpeed(yVel);
     setVelocity(sf::Vector2f(0.f, yVel));
-}
-
-// Public Method
-const void Enemy::update(const sf::Time& dt)
-{
-    Entity::update(dt);
 }

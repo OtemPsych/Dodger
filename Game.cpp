@@ -63,7 +63,7 @@ const void Game::run()
         {
             TimeSinceLastUpdate -= TimePerFrame;
             processEvents();
-            mWorld.handleCollision();
+            mWorld.handleCollision(TimePerFrame);
             update(TimePerFrame);
         }
         render();

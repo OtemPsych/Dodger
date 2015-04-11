@@ -11,7 +11,7 @@ Entity::Entity()
         green = rand() % 256,
         blue = rand() % 256;
     mShape.setFillColor(sf::Color(red, green, blue));
-    mShape.setOutlineThickness(2.f);
+    mShape.setOutlineThickness(1.f);
     mShape.setOutlineColor(sf::Color::White);
 }
 

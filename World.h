@@ -4,6 +4,7 @@
 #include "TextHolder.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Power-Ups.h"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -13,21 +14,24 @@ class World :private sf::NonCopyable
 {
 private:
 // Private Data Members
-    std::vector<Player> mPlayers;
-    std::vector<Enemy>  mEnemies;
+    std::vector<Player>    mPlayers;
+    unsigned short         mPlayerBase;
+    unsigned short         mMaxPlayerBase;
 
-    unsigned short      mPlayerBase;
-    unsigned short      mMaxPlayerBase;
+    std::vector<Enemy>     mEnemies;
+    unsigned short         mMaxEnemyBase;
 
-    unsigned short      mMaxEnemyBase;
+    std::vector<Power_Ups> mPowerUps;
 
     TextHolder          mTextHolder;
     sf::RenderWindow&   mWindow;
 
 // Private Methods
+    const void addPlayers();
     const void addEnemies();
     const void recycleEnemies();
-    const void addPlayers();
+    const void addPowerUps();
+    const void recyclePowerUps();
 
     const void resetGame();
     const void loadTexts();
@@ -37,7 +41,7 @@ public:
     explicit World(sf::RenderWindow& window);
 // Public Methods
     const void handleInput(const sf::Keyboard::Key& key, const bool isPressed);
-    const void handleCollision();
+    const void handleCollision(const sf::Time& dt);
     const void update(const sf::Time& dt);
     const void draw();
 

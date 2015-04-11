@@ -3,10 +3,10 @@
 // Constructor
 World::World(sf::RenderWindow& window)
     : mPlayers()
-    , mEnemies()
     , mPlayerBase(1)
-    , mMaxPlayerBase(4)
-    , mMaxEnemyBase(30)
+    , mMaxPlayerBase(40)
+    , mEnemies()
+    , mMaxEnemyBase(25)
     , mTextHolder()
     , mWindow(window)
 {
@@ -15,21 +15,6 @@ World::World(sf::RenderWindow& window)
 }
 
 // Private Methods
-    // Add Enemies
-const void World::addEnemies()
-{
-    if (mEnemies.size() < mMaxEnemyBase) {
-        Enemy newEnemy(sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
-        mEnemies.push_back(std::move(newEnemy));
-    }
-}
-    // Recycle Enemies
-const void World::recycleEnemies()
-{
-    for (unsigned i = 0; i < mEnemies.size(); i++)
-        if (mEnemies[i].getShape().getPosition().y > mWindow.getSize().y)
-            mEnemies.erase(mEnemies.begin()+i);
-}
     // Add Players
 const void World::addPlayers()
 {
@@ -46,12 +31,45 @@ const void World::addPlayers()
         mPlayers.push_back(std::move(player));
     }
 }
+    // Add Enemies
+const void World::addEnemies()
+{
+    if (mEnemies.size() < mMaxEnemyBase) {
+        Enemy newEnemy(sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
+        mEnemies.push_back(std::move(newEnemy));
+    }
+}
+    // Recycle Enemies
+const void World::recycleEnemies()
+{
+    for (unsigned i = 0; i < mEnemies.size(); i++)
+        if (mEnemies[i].getShape().getPosition().y > mWindow.getSize().y)
+            mEnemies.erase(mEnemies.begin()+i);
+}
+    // Add Power Ups
+const void World::addPowerUps()
+{
+    int chance = rand() % 5000;
+    if (chance < 20) {
+        Power_Ups newPowerUp((chance < 2 ? Power_Ups::INVULNERABILITY
+                                         : Power_Ups::SLOW), sf::Vector2f(mWindow.getSize()));
+        mPowerUps.push_back(std::move(newPowerUp));
+    }
+}
+    // Recycle Power Ups
+const void World::recyclePowerUps()
+{
+    for (unsigned i = 0; i < mPowerUps.size(); i++)
+        if (mPowerUps[i].getShape().getPosition().y > mWindow.getSize().y)
+            mPowerUps.erase(mPowerUps.begin()+i);
+}
     // Reset Game
 const void World::resetGame()
 {
     mPlayers.clear();
     addPlayers();
     mEnemies.clear();
+    mPowerUps.clear();
 }
     // Load Texts
 const void World::loadTexts()
@@ -126,18 +144,16 @@ const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed
     }
 }
     // Handle Collision
-const void World::handleCollision()
+const void World::handleCollision(const sf::Time& dt)
 {
-    for (unsigned i = 0; i < mPlayers.size(); i++) {
-        mPlayers[i].handleCollision(sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
-        if (mPlayers[i].handleCollision(mEnemies)) {
+    for (unsigned i = 0; i < mPlayers.size(); i++)
+        if (mPlayers[i].handleCollision(mPowerUps, mEnemies, sf::Vector2f(mWindow.getSize()), dt)) {
             mPlayers[i].getShape().setFillColor(sf::Color(mPlayers[i].getShape().getFillColor().r,
                                                           mPlayers[i].getShape().getFillColor().g,
                                                           mPlayers[i].getShape().getFillColor().b,
                                                           0.f));
             mPlayers[i].getShape().setOutlineThickness(0.f);
         }
-    }
 
     unsigned short totalDead = 0;
     for (unsigned i = 0; i < mPlayers.size(); i++)
@@ -160,10 +176,14 @@ const void World::update(const sf::Time& dt)
         }
         if (mEnemies.begin()+i < mEnemies.end())
             mEnemies[i].update(dt);
+        if (mPowerUps.begin()+i < mPowerUps.end())
+            mPowerUps[i].update(dt);
     }
 
     addEnemies();
     recycleEnemies();
+    addPowerUps();
+    recyclePowerUps();
 }
     // Draw
 const void World::draw()
@@ -178,5 +198,8 @@ const void World::draw()
                 mWindow.draw(mPlayers[i].getShape());
             mWindow.draw(mTextHolder.get(Texts::Scores, i));
         }
+
+        if (mPowerUps.begin()+i < mPowerUps.end())
+            mWindow.draw(mPowerUps[i].getShape());
     }
 }

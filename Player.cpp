@@ -12,9 +12,9 @@ std::string NumberToString(T num)
 // Constructor
 Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2f& worldBounds)
     : Entity()
-    , mSpeed(475.f)
     , mScore(0)
     , mScoreText(text)
+    , mHavePower(false)
 {
 // Shape
     float Size = 45.f;
@@ -25,7 +25,8 @@ Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2
 // Side
     setSide(PLAYER);
 // Velocity
-    setVelocity(sf::Vector2f(mSpeed, mSpeed));
+    setSpeed(475.f);
+    setVelocity(sf::Vector2f(getSpeed(), getSpeed()));
 // Movement
     mMovement.UP = mMovement.DOWN
     = mMovement.LEFT = mMovement.RIGHT = false;
@@ -52,8 +53,12 @@ const void Player::setRelativeTextPosition(const sf::Vector2f& relText) const
 
 // Public Methods
     // Handle Collision
-const void Player::handleCollision(const sf::Vector2f& worldBounds)
+const bool Player::handleCollision(std::vector<Power_Ups>& powers,
+                                   std::vector<Enemy>& enemies,
+                                   const sf::Vector2f& worldBounds,
+                                   const sf::Time& dt)
 {
+// Wall Collision
     if (getShape().getPosition().y < 0.f)
         mMovement.UP = false;
     else if (getShape().getPosition().y + getShape().getSize().y > worldBounds.y)
@@ -62,17 +67,54 @@ const void Player::handleCollision(const sf::Vector2f& worldBounds)
         mMovement.LEFT = false;
     else if (getShape().getPosition().x + getShape().getSize().x > worldBounds.x)
         mMovement.RIGHT = false;
-}
-    // Handle Collision
-const bool Player::handleCollision(std::vector<Enemy>& enemies)
-{
+
 // Entity Collision
-    for (unsigned i = 0; i < enemies.size(); i++)
-        if (getShape().getPosition().x < enemies[i].getShape().getPosition().x + enemies[i].getShape().getSize().x
-         && getShape().getPosition().x + getShape().getSize().x > enemies[i].getShape().getPosition().x
-         && getShape().getPosition().y < enemies[i].getShape().getPosition().y + enemies[i].getShape().getSize().y
-         && getShape().getPosition().y + getShape().getSize().y > enemies[i].getShape().getPosition().y)
-            return true;
+    for (unsigned i = 0; i < (enemies.size() > powers.size() ? enemies.size()
+                                                             : powers.size()); i++) {
+        if (powers.begin()+i < powers.end())
+            if (getShape().getPosition().x < powers[i].getShape().getPosition().x + powers[i].getShape().getSize().x
+             && getShape().getPosition().x + getShape().getSize().x > powers[i].getShape().getPosition().x
+             && getShape().getPosition().y < powers[i].getShape().getPosition().y + powers[i].getShape().getSize().y
+             && getShape().getPosition().y + getShape().getSize().y > powers[i].getShape().getPosition().y) {
+                if (powers[i].getType() == Power_Ups::SLOW) {
+                    setHavePower(true);
+                    for (unsigned j = 0; j < enemies.size(); j++)
+                        if (enemies[j].getVelocity().y == enemies[j].getSpeed())
+                            enemies[j].setVelocity(sf::Vector2f(0.f, enemies[j].getSpeed() / 2));
+                }
+                else if (powers[i].getType() == Power_Ups::INVULNERABILITY) {
+                    setHavePower(true);
+                    powers[i].setPowerDuration(sf::seconds(5.f));
+                    getShape().setOutlineColor(powers[i].getShape().getOutlineColor());
+                    getShape().setOutlineThickness(powers[i].getShape().getOutlineThickness());
+                }
+                powers.erase(powers.begin()+i);
+        }
+        if (getHavePower() && (powers[i].getPowerDuration() > sf::Time::Zero)) {
+            powers[i].setPowerDuration(powers[i].getPowerDuration() - dt);
+            if (powers[i].getPowerDuration() < sf::seconds(1.5)) {
+                if (getShape().getOutlineColor() == powers[i].getShape().getOutlineColor()) {
+                    getShape().setOutlineColor(enemies[0].getShape().getOutlineColor());
+                    getShape().setOutlineThickness(enemies[0].getShape().getOutlineThickness());
+                }
+                else {
+                    getShape().setOutlineColor(powers[i].getShape().getOutlineColor());
+                    getShape().setOutlineThickness(powers[i].getShape().getOutlineThickness());
+                }
+            }
+            return false;
+        }
+        setHavePower(false);
+        getShape().setOutlineColor(enemies[0].getShape().getOutlineColor());
+        getShape().setOutlineThickness(enemies[0].getShape().getOutlineThickness());
+
+        if (enemies.begin()+i < enemies.end())
+            if (getShape().getPosition().x < enemies[i].getShape().getPosition().x + enemies[i].getShape().getSize().x
+             && getShape().getPosition().x + getShape().getSize().x > enemies[i].getShape().getPosition().x
+             && getShape().getPosition().y < enemies[i].getShape().getPosition().y + enemies[i].getShape().getSize().y
+             && getShape().getPosition().y + getShape().getSize().y > enemies[i].getShape().getPosition().y)
+                return true;
+    }
 
     return false;
 }
@@ -82,13 +124,13 @@ const void Player::update(const sf::Time& dt)
     sf::Vector2f movement(0.f, 0.f);
 
     if (mMovement.UP)
-        movement.y -= mSpeed;
+        movement.y -= getSpeed();
     if (mMovement.DOWN)
-        movement.y += mSpeed;
+        movement.y += getSpeed();
     if (mMovement.LEFT)
-        movement.x -= mSpeed;
+        movement.x -= getSpeed();
     if (mMovement.RIGHT)
-        movement.x += mSpeed;
+        movement.x += getSpeed();
 
     setVelocity(movement);
     Entity::update(dt);
