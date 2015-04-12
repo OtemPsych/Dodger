@@ -49,10 +49,14 @@ const void World::recycleEnemies()
     // Add Power Ups
 const void World::addPowerUps()
 {
-    int chance = rand() % 5000;
+    int visiblePlayers = 0;
+    for (unsigned i = 0; i < mPlayers.size(); i++)
+        if (mPlayers[i].getVisible())
+            visiblePlayers++;
+
+    int chance = rand() % 5000 / (visiblePlayers / 6+1);
     if (chance < 20) {
-        Power_Ups newPowerUp((chance < 2 ? Power_Ups::INVULNERABILITY
-                                         : Power_Ups::SLOW), sf::Vector2f(mWindow.getSize()));
+        Power_Ups newPowerUp(Power_Ups::SLOW, sf::Vector2f(mWindow.getSize()));
         mPowerUps.push_back(std::move(newPowerUp));
     }
 }
@@ -60,7 +64,7 @@ const void World::addPowerUps()
 const void World::recyclePowerUps()
 {
     for (unsigned i = 0; i < mPowerUps.size(); i++)
-        if (mPowerUps[i].getShape().getPosition().y > mWindow.getSize().y)
+        if (mPowerUps[i].getShape().getPosition().y > mWindow.getSize().y || !mPowerUps[i].getVisible())
             mPowerUps.erase(mPowerUps.begin()+i);
 }
     // Reset Game
@@ -147,17 +151,12 @@ const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed
 const void World::handleCollision(const sf::Time& dt)
 {
     for (unsigned i = 0; i < mPlayers.size(); i++)
-        if (mPlayers[i].handleCollision(mPowerUps, mEnemies, sf::Vector2f(mWindow.getSize()), dt)) {
-            mPlayers[i].getShape().setFillColor(sf::Color(mPlayers[i].getShape().getFillColor().r,
-                                                          mPlayers[i].getShape().getFillColor().g,
-                                                          mPlayers[i].getShape().getFillColor().b,
-                                                          0.f));
-            mPlayers[i].getShape().setOutlineThickness(0.f);
-        }
+        if (mPlayers[i].handleCollision(mPowerUps, mEnemies, sf::Vector2f(mWindow.getSize()), dt))
+            mPlayers[i].setVisible(false);
 
     unsigned short totalDead = 0;
     for (unsigned i = 0; i < mPlayers.size(); i++)
-        if (mPlayers[i].getShape().getFillColor().a == 0.f)
+        if (!mPlayers[i].getVisible())
             totalDead++;
 
     if (totalDead == mPlayers.size()) {
@@ -170,13 +169,13 @@ const void World::update(const sf::Time& dt)
 {
     for (unsigned i = 0; i < (mPlayers.size() > mEnemies.size() ? mPlayers.size()
                                                                 : mEnemies.size()); i++) {
-        if (mPlayers.begin()+i < mPlayers.end()) {
+        if (mPlayers.begin()+i < mPlayers.end() && mPlayers[i].getVisible()) {
             mPlayers[i].update(dt);
             mTextHolder.correctProperties(mTextHolder.get(Texts::Scores, i));
         }
-        if (mEnemies.begin()+i < mEnemies.end())
+        if (mEnemies.begin()+i < mEnemies.end() && mEnemies[i].getVisible())
             mEnemies[i].update(dt);
-        if (mPowerUps.begin()+i < mPowerUps.end())
+        if (mPowerUps.begin()+i < mPowerUps.end() && mPowerUps[i].getVisible())
             mPowerUps[i].update(dt);
     }
 
@@ -190,16 +189,16 @@ const void World::draw()
 {
     for (unsigned i = 0; i < (mPlayers.size() > mEnemies.size() ? mPlayers.size()
                                                                 : mEnemies.size()); i++) {
-        if (mEnemies.begin()+i < mEnemies.end())
+        if (mEnemies.begin()+i < mEnemies.end() && mEnemies[i].getVisible())
             mWindow.draw(mEnemies[i].getShape());
 
         if (mPlayers.begin()+i < mPlayers.end()) {
-            if (mPlayers[i].getShape().getFillColor().a > 0.f)
+            if (mPlayers[i].getVisible())
                 mWindow.draw(mPlayers[i].getShape());
             mWindow.draw(mTextHolder.get(Texts::Scores, i));
         }
 
-        if (mPowerUps.begin()+i < mPowerUps.end())
+        if (mPowerUps.begin()+i < mPowerUps.end() && mPowerUps[i].getVisible())
             mWindow.draw(mPowerUps[i].getShape());
     }
 }

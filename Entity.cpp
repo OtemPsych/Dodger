@@ -2,6 +2,7 @@
 
 // Constructor
 Entity::Entity()
+    : mVisible(true)
 {
     // General Properties
     mShape.setOrigin(mShape.getLocalBounds().height / 2,

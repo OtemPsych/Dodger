@@ -7,7 +7,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 namespace Texts {
-    enum ID { Scores, Controls };
+    enum ID { Scores };
 }
 class TextHolder :private sf::NonCopyable
 {

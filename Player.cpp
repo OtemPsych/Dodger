@@ -14,7 +14,6 @@ Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2
     : Entity()
     , mScore(0)
     , mScoreText(text)
-    , mHavePower(false)
 {
 // Shape
     float Size = 45.f;
@@ -39,7 +38,7 @@ Player::Player(sf::Text& text, const sf::Vector2f& relTextPos, const sf::Vector2
     // Update Score
 const void Player::updateScore()
 {
-    if (getShape().getFillColor().a != 0.f) {
+    if (getVisible()) {
         mScore += 1;
         mScoreText.setString("Score: " + NumberToString(mScore));
     }
@@ -71,44 +70,17 @@ const bool Player::handleCollision(std::vector<Power_Ups>& powers,
 // Entity Collision
     for (unsigned i = 0; i < (enemies.size() > powers.size() ? enemies.size()
                                                              : powers.size()); i++) {
-        if (powers.begin()+i < powers.end())
+        if (powers.begin()+i < powers.end() && powers[i].getVisible())
             if (getShape().getPosition().x < powers[i].getShape().getPosition().x + powers[i].getShape().getSize().x
              && getShape().getPosition().x + getShape().getSize().x > powers[i].getShape().getPosition().x
              && getShape().getPosition().y < powers[i].getShape().getPosition().y + powers[i].getShape().getSize().y
              && getShape().getPosition().y + getShape().getSize().y > powers[i].getShape().getPosition().y) {
-                if (powers[i].getType() == Power_Ups::SLOW) {
-                    setHavePower(true);
-                    for (unsigned j = 0; j < enemies.size(); j++)
-                        if (enemies[j].getVelocity().y == enemies[j].getSpeed())
-                            enemies[j].setVelocity(sf::Vector2f(0.f, enemies[j].getSpeed() / 2));
-                }
-                else if (powers[i].getType() == Power_Ups::INVULNERABILITY) {
-                    setHavePower(true);
-                    powers[i].setPowerDuration(sf::seconds(5.f));
-                    getShape().setOutlineColor(powers[i].getShape().getOutlineColor());
-                    getShape().setOutlineThickness(powers[i].getShape().getOutlineThickness());
-                }
-                powers.erase(powers.begin()+i);
-        }
-        if (getHavePower() && (powers[i].getPowerDuration() > sf::Time::Zero)) {
-            powers[i].setPowerDuration(powers[i].getPowerDuration() - dt);
-            if (powers[i].getPowerDuration() < sf::seconds(1.5)) {
-                if (getShape().getOutlineColor() == powers[i].getShape().getOutlineColor()) {
-                    getShape().setOutlineColor(enemies[0].getShape().getOutlineColor());
-                    getShape().setOutlineThickness(enemies[0].getShape().getOutlineThickness());
-                }
-                else {
-                    getShape().setOutlineColor(powers[i].getShape().getOutlineColor());
-                    getShape().setOutlineThickness(powers[i].getShape().getOutlineThickness());
-                }
+                if (powers[i].getType() == Power_Ups::SLOW)
+                    powers[i].usePower(enemies, dt);
+                powers[i].setVisible(false);
             }
-            return false;
-        }
-        setHavePower(false);
-        getShape().setOutlineColor(enemies[0].getShape().getOutlineColor());
-        getShape().setOutlineThickness(enemies[0].getShape().getOutlineThickness());
 
-        if (enemies.begin()+i < enemies.end())
+        if (enemies.begin()+i < enemies.end() && enemies[i].getVisible())
             if (getShape().getPosition().x < enemies[i].getShape().getPosition().x + enemies[i].getShape().getSize().x
              && getShape().getPosition().x + getShape().getSize().x > enemies[i].getShape().getPosition().x
              && getShape().getPosition().y < enemies[i].getShape().getPosition().y + enemies[i].getShape().getSize().y

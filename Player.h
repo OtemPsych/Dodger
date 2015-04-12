@@ -4,6 +4,8 @@
 #include "Enemy.h"
 #include "Power-Ups.h"
 
+#include <memory>
+
 #include <SFML/Graphics/Text.hpp>
 
 class Power_Ups;
@@ -16,11 +18,9 @@ private:
              DOWN,
              LEFT,
              RIGHT;
-    }         mMovement;
-    long      mScore;
-    sf::Text& mScoreText;
-
-    bool      mHavePower;
+    }          mMovement;
+    long       mScore;
+    sf::Text&  mScoreText;
 
 // Private Methods
     const void updateScore();
@@ -35,12 +35,8 @@ public:
                                const sf::Vector2f& worldBounds,
                                const sf::Time& dt);
     virtual const void update(const sf::Time& dt);
-
-    // Setter
-    inline const void setHavePower(const bool cond) { mHavePower = cond; }
     // Getters
     inline const sf::Text& getScoreText() const { return mScoreText; }
     inline movement& getMovement() { return mMovement; }
-    inline const bool getHavePower() const { return mHavePower; }
 };
 #endif // Player_H_

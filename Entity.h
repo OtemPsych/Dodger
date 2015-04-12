@@ -16,6 +16,8 @@ private:
     Side               mSide;
     float              mSpeed;
     sf::Vector2f       mVelocity;
+
+    bool               mVisible;
 protected:
 // Protected Methods
     // Setters
@@ -27,13 +29,15 @@ public:
     virtual ~Entity() = 0;
 // Public Methods
     virtual const void update(const sf::Time& dt);
-    // Setter
+    // Setters
     inline const void setSpeed(const float speed) { mSpeed = speed; }
     inline const void setVelocity(const sf::Vector2f& vel) { mVelocity = vel; }
-    // Getter
+    inline const void setVisible(const bool status) { mVisible = status; }
+    // Getters
     inline sf::RectangleShape& getShape() { return mShape; }
     inline const float getSpeed() const { return mSpeed; }
     inline const sf::Vector2f& getVelocity() const { return mVelocity; }
+    inline const bool getVisible() const { return mVisible; }
 };
 
 #endif // Entity_H_
